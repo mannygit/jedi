@@ -4,6 +4,7 @@ anything changes, it only reparses the changed parts. But because it's not
 finished (and still not working as I want), I won't document it any further.
 """
 import re
+import os.path
 
 from jedi._compatibility import use_metaclass
 from jedi import settings
@@ -65,7 +66,7 @@ class CachedFastParser(type):
             return parsing.Parser(source, module_path, user_position)
 
         pi = cache.parser_cache.get(module_path, None)
-        if pi is None or isinstance(pi.parser, parsing.Parser):
+        if pi is None or isinstance(pi.parser, parsing.Parser) or pi.change_time != (module_path and os.path.getmtime(module_path) or -1):
             p = super(CachedFastParser, self).__call__(source, module_path,
                                                             user_position)
         else:
